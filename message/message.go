@@ -55,7 +55,6 @@ func (m *Message) UnmarshalJSON(b []byte) error {
 				m.Exit = Exit(v)
 			}
 		}
-
 	}
 
 	return nil
