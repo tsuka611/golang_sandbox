@@ -63,8 +63,7 @@ func loadAgentConfig() {
 	}
 
 	if val, ok := m["port"].(float64); !ok {
-		log.TRACE.Println("Cannot get `port` value, and setting default.")
-		c.port = 9013
+		panic(fmt.Sprintf("Cannot get `port` value. [%v]", m["port"]))
 	} else {
 		c.port = int(val)
 	}
