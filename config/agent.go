@@ -2,13 +2,13 @@ package config
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/tsuka611/golang_sandbox/log"
 	"github.com/tsuka611/golang_sandbox/util"
 	"io/ioutil"
 	"path/filepath"
 	"sync"
-	"encoding/json"
 )
 
 type agentConfig struct {

@@ -2,19 +2,19 @@ package config
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"github.com/tsuka611/golang_sandbox/log"
 	"github.com/tsuka611/golang_sandbox/util"
 	"os"
 	"path/filepath"
 	"sync"
-	"flag"
 )
 
 type RunType int8
 type coreConfig struct {
-	prgDir string
-	appDir string
+	prgDir     string
+	appDir     string
 	configFile string
 }
 
@@ -26,10 +26,10 @@ const (
 )
 
 var (
-	coreConf *coreConfig
-	onceCoreConf sync.Once
+	coreConf        *coreConfig
+	onceCoreConf    sync.Once
 	argConfFilePath string
-	isTrace bool
+	isTrace         bool
 )
 
 func (c *coreConfig) PrgDir() string {
@@ -40,7 +40,7 @@ func (c *coreConfig) AppDir() string {
 	return c.appDir
 }
 
-func (c * coreConfig) ConfigFile() string {
+func (c *coreConfig) ConfigFile() string {
 	return c.configFile
 }
 
@@ -79,7 +79,7 @@ func init() {
 	flag.StringVar(&argConfFilePath, "c", "", "option for config file path.")
 	flag.BoolVar(&isTrace, "trace", false, "option for output trace log.")
 	flag.Parse()
-	if (isTrace) {
+	if isTrace {
 		log.SetLogLevel(log.L_TRACE)
 	}
 }

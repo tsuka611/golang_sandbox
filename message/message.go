@@ -3,9 +3,9 @@ package message
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/tsuka611/golang_sandbox/log"
+	"github.com/tsuka611/golang_sandbox/util"
 	"strings"
 )
 
@@ -37,19 +37,19 @@ func (m *Message) UnmarshalJSON(b []byte) error {
 	for key, val := range tmp {
 		switch strings.ToLower(key) {
 		case "jobid":
-			if v, err := convertString(key, val); err != nil {
+			if v, err := util.ToString(key, val); err != nil {
 				return nil
 			} else {
 				m.JobID = JobID(v)
 			}
 		case "status":
-			if v, err := convertFloat64(key, val); err != nil {
+			if v, err := util.ToFloat64(key, val); err != nil {
 				return nil
 			} else {
 				m.Status = Status(v)
 			}
 		case "exit":
-			if v, err := convertFloat64(key, val); err != nil {
+			if v, err := util.ToFloat64(key, val); err != nil {
 				return nil
 			} else {
 				m.Exit = Exit(v)
@@ -58,22 +58,6 @@ func (m *Message) UnmarshalJSON(b []byte) error {
 	}
 
 	return nil
-}
-
-func convertFloat64(key string, val interface{}) (float64, error) {
-	if v, ok := val.(float64); ok {
-		return v, nil
-	} else {
-		return v, errors.New(fmt.Sprintf("Cannot parse `%v`(float64) -> %v", key, v))
-	}
-}
-
-func convertString(key string, val interface{}) (string, error) {
-	if v, ok := val.(string); ok {
-		return v, nil
-	} else {
-		return v, errors.New(fmt.Sprintf("Cannot parse `%v`(string) -> %v", key, v))
-	}
 }
 
 func New(jobID JobID, status Status, exit Exit) *Message {
