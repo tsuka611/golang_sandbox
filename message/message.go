@@ -13,7 +13,7 @@ type JobID string
 type Status int
 type Exit int
 type Message struct {
-	JobID  JobID
+	JobID  JobID  `json:jobid`
 	Status Status `json:status`
 	Exit   Exit   `json:exit`
 }
