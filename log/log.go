@@ -1,17 +1,18 @@
 package log
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"sync"
-	"fmt"
 )
 
 type AppLogger struct {
 	*log.Logger
 }
+
 func (l *AppLogger) Printlnf(format string, v ...interface{}) {
 	l.Output(2, fmt.Sprintln(fmt.Sprintf(format, v...)))
 }
