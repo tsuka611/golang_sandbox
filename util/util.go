@@ -13,18 +13,20 @@ func ExtractOrPanic(f func() (interface{}, error)) interface{} {
 	}
 }
 
-func ToFloat64(key string, val interface{}) (float64, error) {
+func GetByFloat64(m map[string]interface{}, key string) (float64, error) {
+	val := m[key]
 	if v, ok := val.(float64); ok {
 		return v, nil
 	} else {
-		return v, errors.New(fmt.Sprintf("Cannot parse `%v`(float64) -> %v", key, v))
+		return v, errors.New(fmt.Sprintf("Cannot parse `%v`(float64) -> %v", key, val))
 	}
 }
 
-func ToString(key string, val interface{}) (string, error) {
+func GetByString(m map[string]interface{}, key string) (string, error) {
+	val := m[key]
 	if v, ok := val.(string); ok {
 		return v, nil
 	} else {
-		return v, errors.New(fmt.Sprintf("Cannot parse `%v`(string) -> %v", key, v))
+		return v, errors.New(fmt.Sprintf("Cannot parse `%v`(string) -> %v", key, val))
 	}
 }

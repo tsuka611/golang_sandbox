@@ -34,22 +34,22 @@ func (m *Message) UnmarshalJSON(b []byte) error {
 		return err
 	}
 
-	for key, val := range tmp {
+	for key := range tmp {
 		switch strings.ToLower(key) {
 		case "jobid":
-			if v, err := util.ToString(key, val); err != nil {
+			if v, err := util.GetByString(tmp, key); err != nil {
 				return nil
 			} else {
 				m.JobID = JobID(v)
 			}
 		case "status":
-			if v, err := util.ToFloat64(key, val); err != nil {
+			if v, err := util.GetByFloat64(tmp, key); err != nil {
 				return nil
 			} else {
 				m.Status = Status(v)
 			}
 		case "exit":
-			if v, err := util.ToFloat64(key, val); err != nil {
+			if v, err := util.GetByFloat64(tmp, key); err != nil {
 				return nil
 			} else {
 				m.Exit = Exit(v)
