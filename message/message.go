@@ -67,7 +67,7 @@ func New(jobID JobID, status Status, exit Exit) *Message {
 func Marshal(m *Message) (b []byte, e error) {
 	b, e = json.Marshal(m)
 	if e != nil {
-		log.WARN.Println("Marshal failed.", m, e)
+		log.WARN.Printlnf("Marshal failed. Message[%v] Error[%v]", m, e)
 	}
 	return
 }
@@ -76,7 +76,7 @@ func Unmarshal(b []byte) (m *Message, e error) {
 	m = &Message{}
 	e = json.Unmarshal(b, m)
 	if e != nil {
-		log.WARN.Println("Unmarshal failed.", string(b), e)
+		log.WARN.Printlnf("Unmarshal failed. String[%v] Error[%v]", string(b), e)
 	}
 	return
 }

@@ -6,7 +6,15 @@ import (
 	"log"
 	"os"
 	"sync"
+	"fmt"
 )
+
+type AppLogger struct {
+	*log.Logger
+}
+func (l *AppLogger) Printlnf(format string, v ...interface{}) {
+	l.Output(2, fmt.Sprintln(fmt.Sprintf(format, v...)))
+}
 
 type LogLevel int8
 type appWriter struct {
@@ -40,11 +48,11 @@ var (
 	wWarn  = &appWriter{w: ioutil.Discard}
 	wError = &appWriter{w: ioutil.Discard}
 
-	TRACE = log.New(wTrace, "TRACE ", log.Ldate|log.Ltime|log.Lshortfile)
-	DEBUG = log.New(wDebug, "DEBUG ", log.Ldate|log.Ltime|log.Lshortfile)
-	INFO  = log.New(wInfo, "INFO ", log.Ldate|log.Ltime|log.Lshortfile)
-	WARN  = log.New(wWarn, "WARN ", log.Ldate|log.Ltime|log.Lshortfile)
-	ERROR = log.New(wError, "ERROR ", log.Ldate|log.Ltime|log.Lshortfile)
+	TRACE = New(log.New(wTrace, "TRACE ", log.Ldate|log.Ltime|log.Lshortfile))
+	DEBUG = New(log.New(wDebug, "DEBUG ", log.Ldate|log.Ltime|log.Lshortfile))
+	INFO  = New(log.New(wInfo, "INFO ", log.Ldate|log.Ltime|log.Lshortfile))
+	WARN  = New(log.New(wWarn, "WARN ", log.Ldate|log.Ltime|log.Lshortfile))
+	ERROR = New(log.New(wError, "ERROR ", log.Ldate|log.Ltime|log.Lshortfile))
 
 	outputs = map[LogLevel]*appWriter{
 		L_TRACE: wTrace,
@@ -54,6 +62,10 @@ var (
 		L_ERROR: wError,
 	}
 )
+
+func New(l *log.Logger) *AppLogger {
+	return &AppLogger{l}
+}
 
 func SetLogLevel(level LogLevel) {
 	for k, v := range outputs {

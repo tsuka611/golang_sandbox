@@ -72,7 +72,7 @@ func loadCoreConfig() {
 	}).(string)
 	c.configFile = argConfFilePath
 	coreConf = c
-	log.TRACE.Println("Fnish load core config : ", coreConf)
+	log.TRACE.Printlnf("Fnish load core config : [%v]", coreConf)
 }
 
 func init() {
