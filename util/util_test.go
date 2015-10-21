@@ -1,9 +1,10 @@
 package util
-import (
-	"testing"
-	"errors"
-)
 
+import (
+	"errors"
+	"github.com/tsuka611/golang_sandbox/log"
+	"testing"
+)
 
 func TestExtractOrPanic_panic(t *testing.T) {
 	defer func() {
@@ -12,8 +13,8 @@ func TestExtractOrPanic_panic(t *testing.T) {
 		}
 	}()
 	var actual interface{}
-	var expected string =  "OK"
-	actual = ExtractOrPanic(func()(interface{}, error){
+	var expected string = "OK"
+	actual = ExtractOrPanic(func() (interface{}, error) {
 		return expected, errors.New("Error")
 	})
 
@@ -25,7 +26,7 @@ func TestExtractOrPanic_panic(t *testing.T) {
 func TestExtractOrPanic_success(t *testing.T) {
 	var actual interface{}
 	var expected string = "OK"
-	actual = ExtractOrPanic(func()(interface{}, error){
+	actual = ExtractOrPanic(func() (interface{}, error) {
 		return expected, nil
 	})
 	if v, ok := actual.(string); !ok {
@@ -38,7 +39,7 @@ func TestExtractOrPanic_success(t *testing.T) {
 func TestExtractOrPanic_failTypeAssertion(t *testing.T) {
 	var actual interface{}
 	var expected int = 99
-	actual = ExtractOrPanic(func()(interface{}, error){
+	actual = ExtractOrPanic(func() (interface{}, error) {
 		return expected, nil
 	})
 	if _, ok := actual.(string); ok {
@@ -47,16 +48,15 @@ func TestExtractOrPanic_failTypeAssertion(t *testing.T) {
 }
 
 func TestGetByFloat64_keyNotExists(t *testing.T) {
-	m := map[string]interface{} {
-	}
+	m := map[string]interface{}{}
 	if _, e := GetByFloat64(m, "TEST_KEY"); e == nil {
 		t.Errorf("expect error. VALUE[%v]", m["TEST_KEY"])
 	}
 }
 
 func TestGetByFloat64_illevalValueType_string(t *testing.T) {
-	m := map[string]interface{} {
-		"TEST_KEY" : "TEST_VALUE",
+	m := map[string]interface{}{
+		"TEST_KEY": "TEST_VALUE",
 	}
 	if _, e := GetByFloat64(m, "TEST_KEY"); e == nil {
 		t.Errorf("expect error. VALUE[%v]", m["TEST_KEY"])
@@ -64,8 +64,8 @@ func TestGetByFloat64_illevalValueType_string(t *testing.T) {
 }
 
 func TestGetByFloat64_illegalValueType_integer(t *testing.T) {
-	m := map[string]interface{} {
-		"TEST_KEY" : 1,
+	m := map[string]interface{}{
+		"TEST_KEY": 1,
 	}
 	if _, e := GetByFloat64(m, "TEST_KEY"); e == nil {
 		t.Errorf("expect error. VALUE[%v]", m["TEST_KEY"])
@@ -74,8 +74,8 @@ func TestGetByFloat64_illegalValueType_integer(t *testing.T) {
 
 func TestGetByFloat64_positiveValue(t *testing.T) {
 	expected := 11.1
-	m := map[string]interface{} {
-		"TEST_KEY" : expected,
+	m := map[string]interface{}{
+		"TEST_KEY": expected,
 	}
 	if v, e := GetByFloat64(m, "TEST_KEY"); e != nil {
 		t.Errorf("error occurred. ERROR[%v]", e)
@@ -86,8 +86,8 @@ func TestGetByFloat64_positiveValue(t *testing.T) {
 
 func TestGetByFloat64_nevagiveValue(t *testing.T) {
 	expected := -11.1
-	m := map[string]interface{} {
-		"TEST_KEY" : expected,
+	m := map[string]interface{}{
+		"TEST_KEY": expected,
 	}
 	if v, e := GetByFloat64(m, "TEST_KEY"); e != nil {
 		t.Errorf("error occurred. ERROR[%v]", e)
@@ -96,18 +96,16 @@ func TestGetByFloat64_nevagiveValue(t *testing.T) {
 	}
 }
 
-
 func TestGetByString_keyNotExists(t *testing.T) {
-	m := map[string]interface{} {
-	}
+	m := map[string]interface{}{}
 	if _, e := GetByString(m, "TEST_KEY"); e == nil {
 		t.Errorf("expect error. VALUE[%v]", m["TEST_KEY"])
 	}
 }
 
 func TestGetByString_illegalValueType_float(t *testing.T) {
-	m := map[string]interface{} {
-		"TEST_KEY" : 1.1,
+	m := map[string]interface{}{
+		"TEST_KEY": 1.1,
 	}
 	if _, e := GetByString(m, "TEST_KEY"); e == nil {
 		t.Errorf("expect error. VALUE[%v]", m["TEST_KEY"])
@@ -116,8 +114,8 @@ func TestGetByString_illegalValueType_float(t *testing.T) {
 
 func TestGetByString_empty(t *testing.T) {
 	expected := ""
-	m := map[string]interface{} {
-		"TEST_KEY" : expected,
+	m := map[string]interface{}{
+		"TEST_KEY": expected,
 	}
 	if v, e := GetByString(m, "TEST_KEY"); e != nil {
 		t.Errorf("error occurred. ERROR[%v]", e)
@@ -128,12 +126,16 @@ func TestGetByString_empty(t *testing.T) {
 
 func TestGetByString_normal(t *testing.T) {
 	expected := "TEST_VALUE"
-	m := map[string]interface{} {
-		"TEST_KEY" : expected,
+	m := map[string]interface{}{
+		"TEST_KEY": expected,
 	}
 	if v, e := GetByString(m, "TEST_KEY"); e != nil {
 		t.Errorf("error occurred. ERROR[%v]", e)
 	} else if v != expected {
 		t.Errorf("expect `%v` but was `%v`.", expected, v)
 	}
+}
+
+func init() {
+	log.SetLogLevel(log.L_TRACE)
 }
