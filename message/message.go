@@ -9,7 +9,6 @@ import (
 	"strings"
 )
 
-type JobID string
 type Status int
 type Exit int
 type Message struct {
