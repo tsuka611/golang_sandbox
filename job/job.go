@@ -68,6 +68,24 @@ func (j *Job) Success() bool {
 	return j.Finished() && j.ExitStatus() == 0
 }
 
+func (j *Job) runCmd() <-chan bool {
+	exit := make(chan bool)
+	go func(ch chan bool) {
+		defer close(ch)
+		if err := j.cmd.Run(); err != nil {
+			log.ERROR.Println(err)
+		} else {
+			j.updateStatus()
+		}
+		j.setFinished(true)
+	}(exit)
+	return exit
+}
+
+func New(Id string, cmd *exec.Cmd, interrupt <-chan bool) *Job {
+	return &Job{Id: Id, cmd: cmd, interrupt: interrupt, waitStatus: syscall.WaitStatus(0x7F00)}
+}
+
 func Run(job *Job, finish chan<- *Job) {
 	go runBackGround(job, finish)
 }
@@ -90,22 +108,4 @@ func runBackGround(job *Job, finish chan<- *Job) {
 			return
 		}
 	}
-}
-
-func (j *Job) runCmd() <-chan bool {
-	exit := make(chan bool)
-	go func(ch chan bool) {
-		defer close(ch)
-		if err := j.cmd.Run(); err != nil {
-			log.ERROR.Println(err)
-		} else {
-			j.updateStatus()
-		}
-		j.setFinished(true)
-	}(exit)
-	return exit
-}
-
-func New(Id string, cmd *exec.Cmd, interrupt <-chan bool) *Job {
-	return &Job{Id: Id, cmd: cmd, interrupt: interrupt, waitStatus: syscall.WaitStatus(0x7F00)}
 }
