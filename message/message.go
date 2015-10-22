@@ -59,7 +59,7 @@ func (m *Message) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func New(jobID JobID, status Status, exit Exit) *Message {
+func New(jobID job.JobID, status Status, exit Exit) *Message {
 	return &Message{jobID, status, exit}
 }
 

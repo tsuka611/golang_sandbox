@@ -4,17 +4,18 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/tsuka611/golang_sandbox/job"
 	"github.com/tsuka611/golang_sandbox/util"
 	"strings"
 )
 
 type Job struct {
-	ID      JobID    `json:id`      // JobID
-	Command string   `jdon:command` // command search for $PATH
-	Args    []string `json:args`    // argument for command
-	BaseEnv []string `json:baseenv` // env values for common setting. (key=value pairs)
-	Env     []string `json:env`     // env values for custom setting. (key=value pairs)
-	Dir     string   `json:dir`     // working directory for execute
+	ID      job.JobID `json:id`      // JobID
+	Command string    `jdon:command` // command search for $PATH
+	Args    []string  `json:args`    // argument for command
+	BaseEnv []string  `json:baseenv` // env values for common setting. (key=value pairs)
+	Env     []string  `json:env`     // env values for custom setting. (key=value pairs)
+	Dir     string    `json:dir`     // working directory for execute
 }
 
 func (e *Job) String() string {

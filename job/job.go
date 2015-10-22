@@ -9,7 +9,7 @@ import (
 )
 
 type Job struct {
-	Id         string
+	id         JobID
 	cmd        *exec.Cmd
 	interrupt  <-chan bool
 	isFinished bool
@@ -17,8 +17,22 @@ type Job struct {
 	mu         sync.Mutex
 }
 
+func (j *Job) ID() JobID {
+	return j.id
+}
+
 func (j *Job) ExitStatus() int {
 	return j.status().ExitStatus()
+}
+
+func (j *Job) Finished() bool {
+	j.mu.Lock()
+	defer j.mu.Unlock()
+	return j.isFinished
+}
+
+func (j *Job) Success() bool {
+	return j.Finished() && j.ExitStatus() == 0
 }
 
 func (j *Job) status() syscall.WaitStatus {
@@ -58,16 +72,6 @@ func (j *Job) updateStatus() {
 	panic(fmt.Sprintf("Cannot extract WaitStatus from [%v].", sys))
 }
 
-func (j *Job) Finished() bool {
-	j.mu.Lock()
-	defer j.mu.Unlock()
-	return j.isFinished
-}
-
-func (j *Job) Success() bool {
-	return j.Finished() && j.ExitStatus() == 0
-}
-
 func (j *Job) runCmd() <-chan bool {
 	exit := make(chan bool)
 	go func(ch chan bool) {
@@ -82,8 +86,8 @@ func (j *Job) runCmd() <-chan bool {
 	return exit
 }
 
-func New(Id string, cmd *exec.Cmd, interrupt <-chan bool) *Job {
-	return &Job{Id: Id, cmd: cmd, interrupt: interrupt, waitStatus: syscall.WaitStatus(0x7F00)}
+func New(Id JobID, cmd *exec.Cmd, interrupt <-chan bool) *Job {
+	return &Job{id: Id, cmd: cmd, interrupt: interrupt, waitStatus: syscall.WaitStatus(0x7F00)}
 }
 
 func Run(job *Job, finish chan<- *Job) {

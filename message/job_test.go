@@ -5,10 +5,11 @@ import (
 	"github.com/tsuka611/golang_sandbox/log"
 	"reflect"
 	"testing"
+	"github.com/tsuka611/golang_sandbox/job"
 )
 
 func TestString_empty(t *testing.T) {
-	actual := NewJob(JobID("123")).String()
+	actual := NewJob(job.JobID("123")).String()
 	expected := `{ID:123, Command:, Args:[], BaseEnv:[], Env:[], Dir:}`
 	if actual != expected {
 		t.Errorf("expect `%v` but was `%v`", expected, actual)
@@ -16,8 +17,8 @@ func TestString_empty(t *testing.T) {
 }
 
 func TestUnmarshalJSON_empty(t *testing.T) {
-	org := NewJob(JobID("123"))
-	actual := NewJob(JobID("x"))
+	org := NewJob(job.JobID("123"))
+	actual := NewJob(job.JobID("x"))
 
 	buf, err := json.Marshal(org)
 	if err != nil {
@@ -35,14 +36,14 @@ func TestUnmarshalJSON_empty(t *testing.T) {
 }
 
 func TestUnmarshalJSON_normal(t *testing.T) {
-	org := NewJob(JobID("123"))
+	org := NewJob(job.JobID("123"))
 	org.Command = "ls"
 	org.Args = []string{"-l", "*"}
 	org.BaseEnv = []string{"PATH=/bin"}
 	org.Env = []string{"HOME=/home/hoge"}
 	org.Dir = "/opt/local"
 
-	actual := NewJob(JobID("x"))
+	actual := NewJob(job.JobID("x"))
 
 	buf, err := json.Marshal(org)
 	if err != nil {

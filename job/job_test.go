@@ -10,7 +10,7 @@ import (
 
 func TestRun_finishNormal(t *testing.T) {
 	var out bytes.Buffer
-	id := "TestRun_finishNormal"
+	id := JobID("TestRun_finishNormal")
 	cmd := exec.Command("sleep", "1")
 	cmd.Stdout = &out
 	cmd.Stderr = &out
@@ -34,7 +34,7 @@ func TestRun_finishNormal(t *testing.T) {
 
 func TestRun_finishFailed(t *testing.T) {
 	var out bytes.Buffer
-	id := "TestRun_finishFailed"
+	id := JobID("TestRun_finishFailed")
 	cmd := exec.Command("cat", "NoSutchFile")
 	cmd.Stdout = &out
 	cmd.Stderr = &out
@@ -58,7 +58,7 @@ func TestRun_finishFailed(t *testing.T) {
 
 func TestRun_interrupt(t *testing.T) {
 	var out bytes.Buffer
-	id := "TestRun_interrupt"
+	id := JobID("TestRun_interrupt")
 	cmd := exec.Command("sleep", "10")
 	cmd.Stdout = &out
 	cmd.Stderr = &out
@@ -86,7 +86,7 @@ func TestRun_interrupt(t *testing.T) {
 
 func TestRun_commandNotFound(t *testing.T) {
 	var out bytes.Buffer
-	id := "TestRun_commandNotFound"
+	id := JobID("TestRun_commandNotFound")
 	cmd := exec.Command("NoCmd")
 	cmd.Stdout = &out
 	cmd.Stderr = &out
