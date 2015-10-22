@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/tsuka611/golang_sandbox/log"
-	"testing"
 	"reflect"
+	"testing"
 )
 
 func unmarchal(s string) map[string]interface{} {
@@ -15,7 +15,6 @@ func unmarchal(s string) map[string]interface{} {
 	}
 	return m
 }
-
 
 func TestExtractOrPanic_panic(t *testing.T) {
 	defer func() {
@@ -176,7 +175,6 @@ func TestGetByStringArray_normal(t *testing.T) {
 		t.Errorf("expect `%v` but was `%v`.", expected, v)
 	}
 }
-
 
 func init() {
 	log.SetLogLevel(log.L_TRACE)
