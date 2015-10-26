@@ -11,7 +11,7 @@ import (
 	"sync"
 )
 
-type RunType int8
+type AppKey string
 type coreConfig struct {
 	prgDir     string
 	appDir     string
@@ -56,12 +56,12 @@ func (c *coreConfig) String() string {
 
 func CoreConfig() *coreConfig {
 	onceCoreConf.Do(func() {
-		loadCoreConfig()
+		coreConf = loadCoreConfig()
 	})
 	return coreConf
 }
 
-func loadCoreConfig() {
+func loadCoreConfig() *coreConfig {
 	log.TRACE.Println("Start load core config.")
 	c := &coreConfig{}
 	c.prgDir = util.ExtractOrPanic(func() (interface{}, error) {
@@ -71,8 +71,8 @@ func loadCoreConfig() {
 		return filepath.Abs(filepath.Join(c.prgDir, ".."))
 	}).(string)
 	c.configFile = argConfFilePath
-	coreConf = c
-	log.TRACE.Printlnf("Fnish load core config : [%v]", coreConf)
+	log.TRACE.Printlnf("Fnish load core config : [%v]", c)
+	return c
 }
 
 func init() {

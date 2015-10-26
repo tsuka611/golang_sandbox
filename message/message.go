@@ -7,12 +7,13 @@ import (
 	"github.com/tsuka611/golang_sandbox/log"
 	"github.com/tsuka611/golang_sandbox/util"
 	"strings"
+	"github.com/tsuka611/golang_sandbox/job"
 )
 
 type Status int
 type Exit int
 type Message struct {
-	JobID  JobID  `json:jobid`
+	JobID  job.JobID  `json:jobid`
 	Status Status `json:status`
 	Exit   Exit   `json:exit`
 }
@@ -39,7 +40,7 @@ func (m *Message) UnmarshalJSON(b []byte) error {
 			if v, err := util.GetByString(tmp, key); err != nil {
 				return nil
 			} else {
-				m.JobID = JobID(v)
+				m.JobID = job.JobID(v)
 			}
 		case "status":
 			if v, err := util.GetByFloat64(tmp, key); err != nil {

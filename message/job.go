@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/tsuka611/golang_sandbox/job"
 	"github.com/tsuka611/golang_sandbox/util"
 	"strings"
+	"github.com/tsuka611/golang_sandbox/job"
 )
 
 type Job struct {
@@ -47,7 +47,7 @@ func (e *Job) UnmarshalJSON(b []byte) error {
 			if v, err := util.GetByString(tmp, key); err != nil {
 				return err
 			} else {
-				e.ID = JobID(v)
+				e.ID = job.JobID(v)
 			}
 		case "command":
 			if v, err := util.GetByString(tmp, key); err != nil {
@@ -84,6 +84,6 @@ func (e *Job) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func NewJob(id JobID) *Job {
+func NewJob(id job.JobID) *Job {
 	return &Job{ID: id, Args: []string{}, BaseEnv: []string{}, Env: []string{}}
 }
