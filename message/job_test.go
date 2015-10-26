@@ -2,23 +2,30 @@ package message
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/tsuka611/golang_sandbox/config"
+	"github.com/tsuka611/golang_sandbox/job"
 	"github.com/tsuka611/golang_sandbox/log"
 	"reflect"
 	"testing"
-	"github.com/tsuka611/golang_sandbox/job"
 )
 
+func defCommon(s string) *Common {
+	return NewCommon(config.AppKey(s))
+}
+
 func TestString_empty(t *testing.T) {
-	actual := NewJob(job.JobID("123")).String()
-	expected := `{ID:123, Command:, Args:[], BaseEnv:[], Env:[], Dir:}`
+	com := defCommon("first")
+	actual := NewJob(com, job.JobID("123")).String()
+	expected := fmt.Sprintf(`{Common:%v, ID:123, Command:, Args:[], BaseEnv:[], Env:[], Dir:}`, com.String())
 	if actual != expected {
 		t.Errorf("expect `%v` but was `%v`", expected, actual)
 	}
 }
 
-func TestUnmarshalJSON_empty(t *testing.T) {
-	org := NewJob(job.JobID("123"))
-	actual := NewJob(job.JobID("x"))
+func TestUnmarshalMarshal_empty(t *testing.T) {
+	org := NewJob(defCommon("TestKey"), job.JobID("123"))
+	actual := NewJob(defCommon("x"), job.JobID("x"))
 
 	buf, err := json.Marshal(org)
 	if err != nil {
@@ -35,15 +42,16 @@ func TestUnmarshalJSON_empty(t *testing.T) {
 	}
 }
 
-func TestUnmarshalJSON_normal(t *testing.T) {
-	org := NewJob(job.JobID("123"))
+func TestUnmarshalMarshal_normal(t *testing.T) {
+	org := NewJob(defCommon("TestKey"), job.JobID("123"))
+	org.AppKey = "xxxxx"
 	org.Command = "ls"
 	org.Args = []string{"-l", "*"}
 	org.BaseEnv = []string{"PATH=/bin"}
 	org.Env = []string{"HOME=/home/hoge"}
 	org.Dir = "/opt/local"
 
-	actual := NewJob(job.JobID("x"))
+	actual := NewJob(defCommon("x"), job.JobID("x"))
 
 	buf, err := json.Marshal(org)
 	if err != nil {
@@ -57,6 +65,44 @@ func TestUnmarshalJSON_normal(t *testing.T) {
 
 	if !reflect.DeepEqual(org, actual) {
 		t.Errorf("expect `%v` but was `%v`", org, actual)
+	}
+}
+
+func TestUnmarshalJSON_empty(t *testing.T) {
+	src := `{"AppKey":"xxxx", "JobID":"123"}`
+	actual := NewJob(defCommon("x"), job.JobID("x"))
+
+	err := json.Unmarshal([]byte(src), actual)
+	if err != nil {
+		t.Errorf("Error occurred. %v", err)
+	}
+
+	expected := NewJob(defCommon("xxxx"), job.JobID("123"))
+	if !reflect.DeepEqual(expected, actual) {
+		t.Errorf("expect `%v` but was `%v`", expected, actual)
+	}
+}
+
+func TestUnmarshalJSON_normal(t *testing.T) {
+	src := `{"AppKey":"xxxx", "JobID":"123", "Command":"ls", "Args":["*"], "BaseEnv":["BE1=111"], "Env":["E2=22"], "Dir":"TestDir"}`
+	actual := NewJob(defCommon("x"), job.JobID("x"))
+
+	err := json.Unmarshal([]byte(src), actual)
+	if err != nil {
+		t.Errorf("Error occurred. %v", err)
+	}
+
+	expected := NewJob(defCommon("x"), job.JobID("x"))
+	expected.AppKey = "xxxx"
+	expected.JobID = "123"
+	expected.Command = "ls"
+	expected.Args = []string{"*"}
+	expected.BaseEnv = []string{"BE1=111"}
+	expected.Env = []string{"E2=22"}
+	expected.Dir = "TestDir"
+
+	if !reflect.DeepEqual(expected, actual) {
+		t.Errorf("expect `%v` but was `%v`", expected, actual)
 	}
 }
 
