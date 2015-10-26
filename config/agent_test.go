@@ -1,10 +1,10 @@
 package config
 
 import (
-	"io/ioutil"
-	"testing"
-	"path/filepath"
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
+	"testing"
 )
 
 func tmpJson(s string) string {

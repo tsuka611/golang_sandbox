@@ -4,18 +4,18 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/tsuka611/golang_sandbox/job"
 	"github.com/tsuka611/golang_sandbox/log"
 	"github.com/tsuka611/golang_sandbox/util"
 	"strings"
-	"github.com/tsuka611/golang_sandbox/job"
 )
 
 type Status int
 type Exit int
 type Message struct {
-	JobID  job.JobID  `json:jobid`
-	Status Status `json:status`
-	Exit   Exit   `json:exit`
+	JobID  job.JobID `json:jobid`
+	Status Status    `json:status`
+	Exit   Exit      `json:exit`
 }
 
 func (m *Message) String() string {

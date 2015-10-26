@@ -2,11 +2,11 @@ package genkey
 
 import (
 	"crypto/sha256"
+	"fmt"
 	"github.com/tsuka611/golang_sandbox/config"
 	"github.com/tsuka611/golang_sandbox/log"
 	"os"
 	"time"
-	"fmt"
 )
 
 func Gen() config.AppKey {
@@ -16,6 +16,6 @@ func Gen() config.AppKey {
 		host = "UNKNOWN HOST"
 	}
 	now := time.Now().String()
-	key := fmt.Sprintf("%x", sha256.Sum256([]byte(host + now)))
+	key := fmt.Sprintf("%x", sha256.Sum256([]byte(host+now)))
 	return config.AppKey(key)
 }
