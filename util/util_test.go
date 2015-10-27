@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/tsuka611/golang_sandbox/log"
-	"reflect"
-	"testing"
 	"io/ioutil"
 	"path/filepath"
+	"reflect"
+	"testing"
 )
 
 func unmarchal(s string) map[string]interface{} {

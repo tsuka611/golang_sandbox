@@ -3,9 +3,9 @@ package util
 import (
 	"errors"
 	"fmt"
+	"github.com/tsuka611/golang_sandbox/log"
 	"os"
 	"path/filepath"
-	"github.com/tsuka611/golang_sandbox/log"
 )
 
 func ExtractOrPanic(f func() (interface{}, error)) interface{} {

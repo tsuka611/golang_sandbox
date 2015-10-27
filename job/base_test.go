@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func testJob(name string,arg ...string) (*baseJob, chan bool) {
+func testJob(name string, arg ...string) (*baseJob, chan bool) {
 	cmd := exec.Command(name, arg...)
 	cmd.Stdout = log.INFO
 	cmd.Stderr = log.ERROR
@@ -66,7 +66,7 @@ func TestFinished_interruptedJob(t *testing.T) {
 }
 
 func TestExitStatus_notRunJob(t *testing.T) {
-	job,_ := testJob("sleep", "10")
+	job, _ := testJob("sleep", "10")
 	actual, err := job.ExitStatus()
 	expected := ExitStatus(-1)
 	if err == nil {
@@ -78,7 +78,7 @@ func TestExitStatus_notRunJob(t *testing.T) {
 }
 
 func TestExitStatus_finishedJob(t *testing.T) {
-	job,_ := testJob("sleep", "1")
+	job, _ := testJob("sleep", "1")
 	if err := job.Run(); err != nil {
 		t.Errorf("error occurred. ERROR[%v]", err)
 	}
@@ -96,7 +96,7 @@ func TestExitStatus_finishedJob(t *testing.T) {
 }
 
 func TestExitStatus_interruptedJob(t *testing.T) {
-	job,interrupt := testJob("sleep", "10")
+	job, interrupt := testJob("sleep", "10")
 	if err := job.Run(); err != nil {
 		t.Errorf("error occurred. ERROR[%v]", err)
 	}
@@ -113,7 +113,7 @@ func TestExitStatus_interruptedJob(t *testing.T) {
 }
 
 func TestExitStatus_notCmdJob(t *testing.T) {
-	job,_ := testJob("xxsleep", "10")
+	job, _ := testJob("xxsleep", "10")
 	if err := job.Run(); err == nil {
 		t.Errorf(`Error must occur for [%v].`, job)
 	}
@@ -129,7 +129,7 @@ func TestExitStatus_notCmdJob(t *testing.T) {
 }
 
 func TestExitStatus_failCmdJob(t *testing.T) {
-	job,_ := testJob("ping")
+	job, _ := testJob("ping")
 	if err := job.Run(); err != nil {
 		t.Errorf("error occurred. ERROR[%v]", err)
 	}
@@ -145,8 +145,6 @@ func TestExitStatus_failCmdJob(t *testing.T) {
 		t.Errorf("expect not `%v` but was `%v`.", expected, actual)
 	}
 }
-
-
 
 func init() {
 	log.SetLogLevel(log.L_TRACE)
