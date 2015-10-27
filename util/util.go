@@ -3,6 +3,9 @@ package util
 import (
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"github.com/tsuka611/golang_sandbox/log"
 )
 
 func ExtractOrPanic(f func() (interface{}, error)) interface{} {
@@ -47,4 +50,22 @@ func GetByStringArray(m map[string]interface{}, key string) ([]string, error) {
 		ret[i] = v
 	}
 	return ret, nil
+}
+
+func Exists(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
+}
+
+func NewDir(root, dir string) (string, error) {
+	workDir, err := filepath.Abs(filepath.Join(root, string(dir)))
+	if err != nil {
+		log.ERROR.Printlnf("Create NewDir Path failed. %v", err)
+		return workDir, err
+	}
+	if Exists(workDir) {
+		return workDir, errors.New(fmt.Sprintf("`%v` is already exists.", workDir))
+	}
+	os.MkdirAll(workDir, 0755)
+	return workDir, nil
 }

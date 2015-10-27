@@ -6,6 +6,8 @@ import (
 	"github.com/tsuka611/golang_sandbox/log"
 	"reflect"
 	"testing"
+	"io/ioutil"
+	"path/filepath"
 )
 
 func unmarchal(s string) map[string]interface{} {
@@ -173,6 +175,101 @@ func TestGetByStringArray_normal(t *testing.T) {
 		t.Errorf("expect error. VALUE[%v]", m["TEST_KEY"])
 	} else if !reflect.DeepEqual(v, expected) {
 		t.Errorf("expect `%v` but was `%v`.", expected, v)
+	}
+}
+
+func TestExists_notExists(t *testing.T) {
+	path := "xx"
+	actual := Exists(path)
+	expected := false
+	if actual != expected {
+		t.Errorf("expect `%v`, but was `%v`.", expected, actual)
+	}
+}
+
+func TestExists_fileExists(t *testing.T) {
+	f, err := ioutil.TempFile("", "util_test")
+	if err != nil {
+		t.Errorf("error occurred. ERROR[%v]", err)
+	}
+	path := f.Name()
+	actual := Exists(path)
+	expected := true
+	if actual != expected {
+		t.Errorf("expect `%v`, but was `%v`.", expected, actual)
+	}
+}
+
+func TestExists_dirExists(t *testing.T) {
+	f, err := ioutil.TempFile("", "util_test")
+	if err != nil {
+		t.Errorf("error occurred. ERROR[%v]", err)
+	}
+	path := filepath.Dir(f.Name())
+	actual := Exists(path)
+	expected := true
+	if actual != expected {
+		t.Errorf("expect `%v`, but was `%v`.", expected, actual)
+	}
+}
+
+func TestNewDir_fileExists(t *testing.T) {
+	f, err := ioutil.TempFile("", "util_test")
+	if err != nil {
+		t.Errorf("error occurred. ERROR[%v]", err)
+	}
+	expected := filepath.Dir(f.Name())
+	if !Exists(expected) {
+		t.Errorf("Cannot create Temp File.")
+	}
+
+	actual, err := NewDir(filepath.Dir(expected), filepath.Base(expected))
+	if err == nil {
+		t.Errorf(`Error must occur for [%v].`, err)
+	}
+	if actual != expected {
+		t.Errorf("expect `%v`, but was `%v`.", expected, actual)
+	}
+}
+
+func TestNewDir_dirExists(t *testing.T) {
+	f, err := ioutil.TempDir("", "util_test")
+	if err != nil {
+		t.Errorf("error occurred. ERROR[%v]", err)
+	}
+	expected := f
+	if !Exists(expected) {
+		t.Errorf("Cannot create Temp Dir.")
+	}
+
+	actual, err := NewDir(filepath.Dir(expected), filepath.Base(expected))
+	if err == nil {
+		t.Errorf(`Error must occur for [%v].`, expected)
+	}
+	if actual != expected {
+		t.Errorf("expect `%v`, but was `%v`.", expected, actual)
+	}
+}
+
+func TestNewDir_success(t *testing.T) {
+	f, err := ioutil.TempDir("", "util_test")
+	if err != nil {
+		t.Errorf("error occurred. ERROR[%v]", err)
+	}
+	expected := filepath.Join(f, "success")
+	if Exists(expected) {
+		t.Errorf("Cannot create Temp Dir already exists.")
+	}
+
+	actual, err := NewDir(filepath.Dir(expected), filepath.Base(expected))
+	if err != nil {
+		t.Errorf("error occurred. ERROR[%v]", err)
+	}
+	if actual != expected {
+		t.Errorf("expect `%v`, but was `%v`.", expected, actual)
+	}
+	if !Exists(actual) {
+		t.Errorf("Cannot create New Dir.")
 	}
 }
 
