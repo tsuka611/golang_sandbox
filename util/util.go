@@ -3,7 +3,6 @@ package util
 import (
 	"errors"
 	"fmt"
-	"github.com/tsuka611/golang_sandbox/log"
 	"os"
 	"path/filepath"
 )
@@ -60,7 +59,6 @@ func Exists(path string) bool {
 func NewDir(root, dir string) (string, error) {
 	workDir, err := filepath.Abs(filepath.Join(root, string(dir)))
 	if err != nil {
-		log.ERROR.Printlnf("Create NewDir Path failed. %v", err)
 		return workDir, err
 	}
 	if Exists(workDir) {
