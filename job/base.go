@@ -1,10 +1,14 @@
 package job
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"github.com/tsuka611/golang_sandbox/log"
+	"github.com/tsuka611/golang_sandbox/util"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"sync"
 	"syscall"
 )
@@ -29,6 +33,8 @@ type baseJob struct {
 	finished   bool
 	started    bool
 	workDir    string
+	logFile    *os.File
+	logWriter  *bufio.Writer
 	mu         sync.Mutex
 	once       sync.Once
 }
@@ -54,15 +60,33 @@ func (e *baseJob) Finished() bool {
 	return e.finished
 }
 
-func (e *baseJob) Run() error {
+func (e *baseJob) Run() (err error) {
 	if e.Finished() {
-		return errors.New(fmt.Sprintf("Job[%v] is already finifhed."))
+		err = errors.New(fmt.Sprintf("Job[%v] is already finifhed."))
+		return
 	}
 	if e.alreadyStarted() {
-		return errors.New(fmt.Sprintf("Job[%v] is already started."))
+		err = errors.New(fmt.Sprintf("Job[%v] is already started."))
+		return
 	}
+
 	e.mu.Lock()
 	e.started = true
+	if e.logFile == nil {
+		if e.logFile, err = buildLogfile(e.workDir); err != nil {
+			return
+		}
+	}
+	if e.logWriter == nil {
+		e.logWriter = bufio.NewWriter(e.logFile)
+	}
+	if e.cmd.Stdout == nil {
+		e.cmd.Stdout = e.logWriter
+	}
+	if e.cmd.Stderr == nil {
+		e.cmd.Stderr = e.logWriter
+	}
+
 	e.mu.Unlock()
 
 	log.TRACE.Printlnf("Running job. %v", e.JobID)
@@ -119,6 +143,17 @@ func (e *baseJob) closeJob() {
 
 		e.finished = true
 
+		if e.logWriter != nil {
+			if err := e.logWriter.Flush(); err != nil {
+				log.WARN.Printlnf("Log buffer flush failed. %v", err)
+			}
+		}
+		if e.logFile != nil {
+			if err := e.logFile.Close(); err != nil {
+				log.WARN.Println("Log file close failed. %v", err)
+			}
+		}
+
 		ps := e.cmd.ProcessState
 		if ps == nil {
 			log.TRACE.Printlnf("Cannot get ProcessStatus, may be fail running. [%v]", e)
@@ -152,4 +187,19 @@ func newBaseJob(jobID JobID, cmd *exec.Cmd, interrupt <-chan bool, workDir strin
 		finished:   false,
 		workDir:    workDir,
 	}
+}
+
+func buildLogfile(dir string) (*os.File, error) {
+	if !util.Exists(dir) {
+		return nil, errors.New(fmt.Sprintf("%v is not a directory.", dir))
+	}
+	f, err := filepath.Abs(filepath.Join(dir, "output.log"))
+	if err != nil {
+		return nil, err
+	}
+	ret, err := os.OpenFile(f, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return nil, err
+	}
+	return ret, nil
 }

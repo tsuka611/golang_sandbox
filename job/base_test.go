@@ -4,6 +4,7 @@ import (
 	"github.com/tsuka611/golang_sandbox/log"
 	"io/ioutil"
 	"os/exec"
+	"strings"
 	"testing"
 )
 
@@ -143,6 +144,55 @@ func TestExitStatus_failCmdJob(t *testing.T) {
 	}
 	if actual == expected {
 		t.Errorf("expect not `%v` but was `%v`.", expected, actual)
+	}
+}
+
+func TestRun_outputLogCheck_stdout(t *testing.T) {
+	job, _ := testJob("echo", "SampleOutputData")
+	job.cmd.Stdout = nil
+
+	if err := job.Run(); err != nil {
+		t.Errorf("error occurred. ERROR[%v]", err)
+	}
+	if err := job.Wait(); err != nil {
+		t.Errorf("error occurred. ERROR[%v]", err)
+	}
+	if sts, err := job.ExitStatus(); err != nil || sts != 0 {
+		t.Errorf("Command exec failed. STATUS[%v] ERROR[%v]", sts, err)
+	}
+
+	expected := "SampleOutputData"
+	buf, err := ioutil.ReadFile(job.logFile.Name())
+	if err != nil {
+		t.Errorf("error occurred. ERROR[%v]", err)
+	}
+	actual := strings.TrimSpace(string(buf))
+	if actual != expected {
+		t.Errorf("expect `%v` but was `%v`.", expected, actual)
+	}
+}
+
+func TestRun_outputLogCheck_stderr(t *testing.T) {
+	job, _ := testJob("ping", "xx")
+	job.cmd.Stderr = nil
+
+	if err := job.Run(); err != nil {
+		t.Errorf("error occurred. ERROR[%v]", err)
+	}
+	if err := job.Wait(); err == nil {
+		t.Errorf(`Error must occur for [%v].`, job)
+	}
+	if sts, err := job.ExitStatus(); err != nil || sts == 0 {
+		t.Errorf("Command exec success. STATUS[%v] ERROR[%v]", sts, err)
+	}
+
+	buf, err := ioutil.ReadFile(job.logFile.Name())
+	if err != nil {
+		t.Errorf("error occurred. ERROR[%v]", err)
+	}
+	actual := strings.TrimSpace(string(buf))
+	if len(actual) < 1 {
+		t.Errorf("expect `%v` but was `%v`.", "NotEmptyString", actual)
 	}
 }
 
