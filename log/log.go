@@ -17,6 +17,10 @@ func (l *AppLogger) Printlnf(format string, v ...interface{}) {
 	l.Output(2, fmt.Sprintln(fmt.Sprintf(format, v...)))
 }
 
+func (l *AppLogger) Write(p []byte) (n int, err error) {
+	return len(p), l.Output(2, string(p))
+}
+
 type LogLevel int8
 type appWriter struct {
 	mu sync.Mutex
