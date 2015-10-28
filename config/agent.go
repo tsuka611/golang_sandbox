@@ -13,8 +13,9 @@ import (
 
 type agentConfig struct {
 	*coreConfig
-	Port int
-	Key  AppKey
+	Port    int
+	Key     AppKey
+	WorkDir string
 }
 
 func (c *agentConfig) String() string {
@@ -22,6 +23,8 @@ func (c *agentConfig) String() string {
 	buf.WriteString(fmt.Sprintf("coreConfig:%v", c.coreConfig))
 	buf.WriteString(", ")
 	buf.WriteString(fmt.Sprintf("port:%v", c.Port))
+	buf.WriteString(", ")
+	buf.WriteString(fmt.Sprintf("workDir:%v", c.WorkDir))
 	buf.WriteString(", ")
 	switch {
 	case len(c.Key) == 0:
