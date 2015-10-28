@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func testBaseJob(name string, arg ...string) (*baseJob, chan bool) {
+func testCmdJob(name string, arg ...string) (*baseJob, chan bool) {
 	cmd := exec.Command(name, arg...)
 	cmd.Stdout = log.INFO
 	cmd.Stderr = log.ERROR
@@ -22,8 +22,8 @@ func testBaseJob(name string, arg ...string) (*baseJob, chan bool) {
 	return newBaseJob(JobID("123x"), cmd, ch, workDir), ch
 }
 
-func TestBaseJobFinished_notRunJob(t *testing.T) {
-	job, _ := testBaseJob("sleep", "1")
+func TestCmdJobFinished_notRunJob(t *testing.T) {
+	job, _ := testCmdJob("sleep", "1")
 	actual := job.Finished()
 	expected := false
 	if actual != expected {
@@ -31,8 +31,8 @@ func TestBaseJobFinished_notRunJob(t *testing.T) {
 	}
 }
 
-func TestBaseJobFinished_finishedJob(t *testing.T) {
-	job, _ := testBaseJob("sleep", "3")
+func TestCmdJobFinished_finishedJob(t *testing.T) {
+	job, _ := testCmdJob("sleep", "3")
 
 	if err := job.Run(); err != nil {
 		t.Errorf("error occurred. ERROR[%v]", err)
@@ -48,8 +48,8 @@ func TestBaseJobFinished_finishedJob(t *testing.T) {
 	}
 }
 
-func TestBaseJobFinished_interruptedJob(t *testing.T) {
-	job, interrupt := testBaseJob("sleep", "10")
+func TestCmdJobFinished_interruptedJob(t *testing.T) {
+	job, interrupt := testCmdJob("sleep", "10")
 
 	if err := job.Run(); err != nil {
 		t.Errorf("error occurred. ERROR[%v]", err)
@@ -66,8 +66,8 @@ func TestBaseJobFinished_interruptedJob(t *testing.T) {
 	}
 }
 
-func TestBaseJobExitStatus_notRunJob(t *testing.T) {
-	job, _ := testBaseJob("sleep", "10")
+func TestCmdJobExitStatus_notRunJob(t *testing.T) {
+	job, _ := testCmdJob("sleep", "10")
 	actual, err := job.ExitStatus()
 	expected := ExitStatus(-1)
 	if err == nil {
@@ -78,8 +78,8 @@ func TestBaseJobExitStatus_notRunJob(t *testing.T) {
 	}
 }
 
-func TestBaseJobExitStatus_finishedJob(t *testing.T) {
-	job, _ := testBaseJob("sleep", "1")
+func TestCmdJobExitStatus_finishedJob(t *testing.T) {
+	job, _ := testCmdJob("sleep", "1")
 	if err := job.Run(); err != nil {
 		t.Errorf("error occurred. ERROR[%v]", err)
 	}
@@ -96,8 +96,8 @@ func TestBaseJobExitStatus_finishedJob(t *testing.T) {
 	}
 }
 
-func TestBaseJobExitStatus_interruptedJob(t *testing.T) {
-	job, interrupt := testBaseJob("sleep", "10")
+func TestCmdJobExitStatus_interruptedJob(t *testing.T) {
+	job, interrupt := testCmdJob("sleep", "10")
 	if err := job.Run(); err != nil {
 		t.Errorf("error occurred. ERROR[%v]", err)
 	}
@@ -113,8 +113,8 @@ func TestBaseJobExitStatus_interruptedJob(t *testing.T) {
 	}
 }
 
-func TestBaseJobExitStatus_notCmdJob(t *testing.T) {
-	job, _ := testBaseJob("xxsleep", "10")
+func TestCmdJobExitStatus_notCmdJob(t *testing.T) {
+	job, _ := testCmdJob("xxsleep", "10")
 	if err := job.Run(); err == nil {
 		t.Errorf(`Error must occur for [%v].`, job)
 	}
@@ -129,8 +129,8 @@ func TestBaseJobExitStatus_notCmdJob(t *testing.T) {
 	}
 }
 
-func TestBaseJobExitStatus_failCmdJob(t *testing.T) {
-	job, _ := testBaseJob("ping")
+func TestCmdJobExitStatus_failCmdJob(t *testing.T) {
+	job, _ := testCmdJob("ping")
 	if err := job.Run(); err != nil {
 		t.Errorf("error occurred. ERROR[%v]", err)
 	}
@@ -147,8 +147,8 @@ func TestBaseJobExitStatus_failCmdJob(t *testing.T) {
 	}
 }
 
-func TestBaseJobRun_outputLogCheck_stdout(t *testing.T) {
-	job, _ := testBaseJob("echo", "SampleOutputData")
+func TestCmdJobRun_outputLogCheck_stdout(t *testing.T) {
+	job, _ := testCmdJob("echo", "SampleOutputData")
 	job.cmd.Stdout = nil
 
 	if err := job.Run(); err != nil {
@@ -172,8 +172,8 @@ func TestBaseJobRun_outputLogCheck_stdout(t *testing.T) {
 	}
 }
 
-func TestBaseJobRun_outputLogCheck_stderr(t *testing.T) {
-	job, _ := testBaseJob("ping", "xx")
+func TestCmdJobRun_outputLogCheck_stderr(t *testing.T) {
+	job, _ := testCmdJob("ping", "xx")
 	job.cmd.Stderr = nil
 
 	if err := job.Run(); err != nil {
