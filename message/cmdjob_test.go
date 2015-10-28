@@ -1,12 +1,12 @@
 package message
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/tsuka611/golang_sandbox/job"
 	"github.com/tsuka611/golang_sandbox/log"
-	"testing"
-	"encoding/json"
 	"reflect"
+	"testing"
 )
 
 func TestString_cmdjob_empty(t *testing.T) {
@@ -18,7 +18,6 @@ func TestString_cmdjob_empty(t *testing.T) {
 		t.Errorf("expect `%v` but was `%v`", expected, actual)
 	}
 }
-
 
 func TestUnmarshalMarshal_cmdjob_normal(t *testing.T) {
 	base := newBaseJob(defCommon("TestKey"), T_CMD, job.JobID("123"))

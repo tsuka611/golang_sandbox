@@ -1,4 +1,5 @@
 package message
+
 import (
 	"bytes"
 	"fmt"

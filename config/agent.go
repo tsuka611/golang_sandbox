@@ -13,9 +13,10 @@ import (
 
 type agentConfig struct {
 	*coreConfig
-	Port   int
-	Key AppKey
+	Port int
+	Key  AppKey
 }
+
 func (c *agentConfig) String() string {
 	buf := bytes.NewBuffer(make([]byte, 0))
 	buf.WriteString(fmt.Sprintf("coreConfig:%v", c.coreConfig))
