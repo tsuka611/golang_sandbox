@@ -6,23 +6,27 @@ import (
 	"github.com/tsuka611/golang_sandbox/job"
 )
 
-type Job struct {
+type JobType int
+
+const (
+	T_CMD = JobType(1) << iota
+)
+
+type baseJob struct {
 	*Common
-	JobID   job.JobID `json:id`      // JobID
-	Command string    `jdon:command` // command search for $PATH
+	JobType JobType   `json:jobtype` // jobtype
+	JobID   job.JobID `json:jobid`   // JobID
 	Args    []string  `json:args`    // argument for command
 	BaseEnv []string  `json:baseenv` // env values for common setting. (key=value pairs)
 	Env     []string  `json:env`     // env values for custom setting. (key=value pairs)
 	Dir     string    `json:dir`     // working directory for execute
 }
 
-func (e *Job) String() string {
+func (e *baseJob) String() string {
 	buf := bytes.NewBuffer(make([]byte, 0))
 	buf.WriteString(fmt.Sprintf("Common:%v", e.Common))
 	buf.WriteString(", ")
 	buf.WriteString(fmt.Sprintf("ID:%v", e.JobID))
-	buf.WriteString(", ")
-	buf.WriteString(fmt.Sprintf("Command:%v", e.Command))
 	buf.WriteString(", ")
 	buf.WriteString(fmt.Sprintf("Args:%v", e.Args))
 	buf.WriteString(", ")
@@ -35,6 +39,6 @@ func (e *Job) String() string {
 	return "{" + buf.String() + "}"
 }
 
-func NewJob(c *Common, jobId job.JobID) *Job {
-	return &Job{Common: c, JobID: jobId, Args: []string{}, BaseEnv: []string{}, Env: []string{}}
+func newBaseJob(c *Common, jobType JobType, jobId job.JobID) *baseJob {
+	return &baseJob{Common: c, JobType: jobType, JobID: jobId, Args: []string{}, BaseEnv: []string{}, Env: []string{}}
 }
