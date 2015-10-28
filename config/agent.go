@@ -13,31 +13,22 @@ import (
 
 type agentConfig struct {
 	*coreConfig
-	port   int
-	appKey AppKey
+	Port   int
+	Key AppKey
 }
-
-func (c *agentConfig) Port() int {
-	return c.port
-}
-
-func (c *agentConfig) AppKey() AppKey {
-	return c.appKey
-}
-
 func (c *agentConfig) String() string {
 	buf := bytes.NewBuffer(make([]byte, 0))
 	buf.WriteString(fmt.Sprintf("coreConfig:%v", c.coreConfig))
 	buf.WriteString(", ")
-	buf.WriteString(fmt.Sprintf("port:%v", c.port))
+	buf.WriteString(fmt.Sprintf("port:%v", c.Port))
 	buf.WriteString(", ")
 	switch {
-	case len(c.appKey) == 0:
+	case len(c.Key) == 0:
 		buf.WriteString(fmt.Sprintf("appKey:%v", ""))
-	case len(c.appKey) < 4:
+	case len(c.Key) < 4:
 		buf.WriteString(fmt.Sprintf("appKey:%v", "..."))
 	default:
-		buf.WriteString(fmt.Sprintf("appKey:%v", c.appKey[0:3]+"..."))
+		buf.WriteString(fmt.Sprintf("appKey:%v", c.Key[0:3]+"..."))
 	}
 	return "{" + buf.String() + "}"
 }
@@ -71,22 +62,10 @@ func loadAgentConfig(core *coreConfig) *agentConfig {
 	}
 
 	log.TRACE.Println("Try to parse config file.")
-	m := make(map[string]interface{})
-	if err = json.Unmarshal(file, &m); err != nil {
+	if err = json.Unmarshal(file, c); err != nil {
 		panic(err)
 	}
 
-	if val, err := util.GetByFloat64(m, "port"); err != nil {
-		panic(err)
-	} else {
-		c.port = int(val)
-	}
-
-	if val, err := util.GetByString(m, "key"); err != nil {
-		panic(err)
-	} else {
-		c.appKey = AppKey(val)
-	}
 	log.TRACE.Println("Fnish load AGENT config : ", c)
 	return c
 }
