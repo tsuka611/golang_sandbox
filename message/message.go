@@ -1,82 +1,61 @@
 package message
 
 import (
-	"bytes"
+	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/tsuka611/golang_sandbox/job"
+	"github.com/tsuka611/golang_sandbox/config"
 	"github.com/tsuka611/golang_sandbox/log"
-	"github.com/tsuka611/golang_sandbox/util"
-	"strings"
+	"io"
 )
 
-type Status int
-type Exit int
+type Operation string
+
+const (
+	OP_REGISTRATION = "REGISTRATION"
+)
+
 type Message struct {
-	JobID  job.JobID `json:jobid`
-	Status Status    `json:status`
-	Exit   Exit      `json:exit`
+	AppKey    config.AppKey
+	Operation Operation
+	Body      string
 }
 
-func (m *Message) String() string {
-	buf := bytes.NewBuffer(make([]byte, 0))
-	buf.WriteString(fmt.Sprintf("JobID:%v ", m.JobID))
-	buf.WriteString(", ")
-	buf.WriteString(fmt.Sprintf("Status:%v ", m.Status))
-	buf.WriteString(", ")
-	buf.WriteString(fmt.Sprintf("Exit:%v ", m.Exit))
-	return "{" + buf.String() + "}"
-}
-
-func (m *Message) UnmarshalJSON(b []byte) error {
-	tmp := make(map[string]interface{})
-	if err := json.Unmarshal(b, &tmp); err != nil {
-		return err
+func NewMessage(appKey config.AppKey, op Operation, body interface{}) (*Message, error) {
+	b, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
 	}
-
-	for key := range tmp {
-		switch strings.ToLower(key) {
-		case "jobid":
-			if v, err := util.GetByString(tmp, key); err != nil {
-				return nil
-			} else {
-				m.JobID = job.JobID(v)
-			}
-		case "status":
-			if v, err := util.GetByFloat64(tmp, key); err != nil {
-				return nil
-			} else {
-				m.Status = Status(v)
-			}
-		case "exit":
-			if v, err := util.GetByFloat64(tmp, key); err != nil {
-				return nil
-			} else {
-				m.Exit = Exit(v)
-			}
-		}
-	}
-
-	return nil
+	return &Message{AppKey: appKey, Operation: op, Body: string(b)}, nil
 }
 
-func New(jobID job.JobID, status Status, exit Exit) *Message {
-	return &Message{jobID, status, exit}
+func emptyMessage() *Message {
+	return &Message{}
 }
 
-func Marshal(m *Message) (b []byte, e error) {
-	b, e = json.Marshal(m)
-	if e != nil {
-		log.WARN.Printlnf("Marshal failed. Message[%v] Error[%v]", m, e)
+func SendMessage(w io.Writer, m *Message) (err error) {
+	log.TRACE.Println("Try send message.")
+	defer log.TRACE.Printlnf("Finish send message. Error[%v]", err)
+	if _, err = io.WriteString(w, fmt.Sprintln(m.AppKey)); err != nil {
+		return
 	}
+	if _, err = io.WriteString(w, fmt.Sprintln(m.Operation)); err != nil {
+		return
+	}
+	_, err = io.WriteString(w, fmt.Sprintln(m.Body))
 	return
 }
 
-func Unmarshal(b []byte) (m *Message, e error) {
-	m = &Message{}
-	e = json.Unmarshal(b, m)
-	if e != nil {
-		log.WARN.Printlnf("Unmarshal failed. String[%v] Error[%v]", string(b), e)
-	}
-	return
+func ReceiveMessage(r io.Reader) (m *Message, err error) {
+	log.TRACE.Println("Try receive message.")
+	defer log.TRACE.Printlnf("Finish receive message. Error[%v]", err)
+	m = emptyMessage()
+	sc := bufio.NewScanner(r)
+	sc.Scan()
+	m.AppKey = config.AppKey(sc.Text())
+	sc.Scan()
+	m.Operation = Operation(sc.Text())
+	sc.Scan()
+	m.Body = sc.Text()
+	return m, sc.Err()
 }
